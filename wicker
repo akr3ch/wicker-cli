@@ -1,5 +1,6 @@
 #/usr/bin/env bash
 
+#color codes
 B='\e[1m'
 r='\e[31m'
 g='\e[1;32m'
@@ -11,6 +12,7 @@ bl='\e[5m'
 
 #network interface
 phy=$(basename /sys/class/net/wl*)
+
 
 bye () {
 printf "${B}${y}g${s}"
@@ -40,7 +42,7 @@ exit 2
 
 trap "trap_ctrlc" 2
 
-
+#menu option
 menu () {
 echo -e "${r}${B}network interface-[${g} ${phy} ${r}]
 ${y}[${b}1${y}]${r}start monitor mode ${y}[${b}6${y}]${r}deauth channel
