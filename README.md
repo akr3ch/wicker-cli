@@ -1,10 +1,10 @@
   **wicker**
 `the wifi hacker`
 
-##note
+# note
 you must need an wifi adapter which 
 
-##required tools
+# required tools
 ```
 aircrack-ng
 airmon-ng
