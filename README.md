@@ -1,8 +1,8 @@
   **wicker**
 `the wifi hacker`
 
-# note
-you must need an wifi adapter which 
+<h1> note </h1>
+you must need an wifi adapter which supports packet injection and monitor mode.
 
 # required tools
 ```
