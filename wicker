@@ -13,22 +13,26 @@ bl='\e[5m'
 #network interface
 phy=$(basename /sys/class/net/wl*)
 
+if [ $phy == wl* ];
+then
+	phy='not found'
+fi
 
 bye () {
 printf "${B}${y}g${s}"
-sleep 0.3
+sleep 0.2
 printf "${g}o"
-sleep 0.3
+sleep 0.2
 printf "${b}o"
-sleep 0.3
+sleep 0.2
 printf "${p}d "
-sleep 0.3
+sleep 0.2
 printf "${p}b"
-sleep 0.3
+sleep 0.2
 printf "${b}y"
-sleep 0.3
+sleep 0.2
 printf "${g}e "
-sleep 0.5
+sleep 0.2
 printf "${bl}:)${s}"
 }
 
